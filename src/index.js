@@ -28,7 +28,7 @@ function App() {
     const [txPending, setTxPending] = useState(false);
 
     // const [countdownDate, setCountdownDate] = useState(1645128000000); PROD TIMESTAMP
-    const [countdownDate, setCountdownDate] = useState(16451280000);
+    const [countdownDate, setCountdownDate] = useState(1645038300000);
     const [countdownEnded, setCountdownEnded] = useState(undefined);
     const [countdownDays, setCountdownDays] = useState("00");
     const [countdownHours, setCountdownHours] = useState("00");
