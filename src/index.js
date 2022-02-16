@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react'
+import { BrowserView, MobileView } from 'react-device-detect';
 import ReactDOM from 'react-dom'
 import { getWeb3, getOxmose } from "./utils.js";
 const { MerkleTree } = require("merkletreejs");
 const keccak256 = require("keccak256");
 const whitelist = require("../dist/whitelist.json");
+const MathUtils = {
+    roundToPrecision: function (subject, precision) {
+        return +((+subject).toFixed(precision));
+    }
+};
+
 
 function App() {
     const [loader, setLoader] = useState(true);
@@ -16,9 +23,12 @@ function App() {
     const [success, setSuccess] = useState("");
     const [totalSupply, setTotalSupply] = useState(0);
     const [maxSupply, setMaxSupply] = useState(0);
+    const [priceLabel, setPriceLabel] = useState("0.3");
     const [isSoldOut, setSoldOut] = useState(false);
-    const [countdownDate, setCountdownDate] = useState(164503800000);
+    const [txPending, setTxPending] = useState(false);
 
+    // const [countdownDate, setCountdownDate] = useState(1645128000000); PROD TIMESTAMP
+    const [countdownDate, setCountdownDate] = useState(16451280000);
     const [countdownEnded, setCountdownEnded] = useState(undefined);
     const [countdownDays, setCountdownDays] = useState("00");
     const [countdownHours, setCountdownHours] = useState("00");
@@ -27,26 +37,30 @@ function App() {
 
     const init = async () => {
         setLoader(true);
-        const web3 = await getWeb3();
-        const accounts = await web3.eth.getAccounts();
-        const oxmose = await getOxmose(web3);
-        if (!oxmose._address) {
-            alert("Please switch to the Ethereum network, and refresh !");
-        }
-        const totalSupply = await oxmose.methods.OXMOSE_MAX_SUPPLY().call();
-        const maxSupply = await oxmose.methods.totalSupply().call();
-        const nbMintPublic = await oxmose.methods.numberMinted(accounts[0]).call();
+        if (window.ethereum) {
+            const web3 = await getWeb3();
+            const accounts = await web3.eth.getAccounts();
+            const oxmose = await getOxmose(web3);
+            if (!oxmose._address) {
+                alert("Please switch to the Ethereum network, and refresh !");
+            }
+            const totalSupply = await oxmose.methods.OXMOSE_MAX_SUPPLY().call();
+            const maxSupply = await oxmose.methods.totalSupply().call();
+            const nbMintPublic = await oxmose.methods.numberMinted(accounts[0]).call();
 
-        if (totalSupply === maxSupply) {
-            setSoldOut(true);
-        }
+            if (totalSupply === maxSupply) {
+                setSoldOut(true);
+            }
 
-        setWeb3(web3);
-        setAccounts(accounts);
-        setOxmose(oxmose);
-        setTotalSupply(totalSupply);
-        setMaxSupply(maxSupply);
-        setNbMintPublic(nbMintPublic);
+            setWeb3(web3);
+            setAccounts(accounts);
+            setOxmose(oxmose);
+            setTotalSupply(totalSupply);
+            setMaxSupply(maxSupply);
+            setNbMintPublic(nbMintPublic);
+
+            initEventListener()
+        }
         setLoader(false);
     }
 
@@ -85,26 +99,38 @@ function App() {
         initCountdown();
     }, [])
 
-    window.ethereum.addListener('connect', async (response) => {
-        const accounts = await web3.eth.getAccounts();
-        setAccounts(accounts);
-    });
+    const initEventListener = async () => {
+        window.ethereum.addListener('connect', async (response) => {
+            const accounts = await web3.eth.getAccounts();
+            setAccounts(accounts);
+        });
 
-    window.ethereum.on('accountsChanged', () => {
-        window.location.reload();
-    });
+        window.ethereum.on('accountsChanged', () => {
+            window.location.reload();
+        });
 
-    window.ethereum.on('chainChanged', () => {
-        window.location.reload();
-    });
+        window.ethereum.on('chainChanged', () => {
+            window.location.reload();
+        });
 
-    window.ethereum.on('disconnect', () => {
-        window.location.reload();
-    });
+        window.ethereum.on('disconnect', () => {
+            window.location.reload();
+        });
+    }
 
     function handleQtyChange(e) {
-        checkQuantity(parseInt(e.target.value));
-        setQty(parseInt(e.target.value));
+        let qty = parseInt(e.target.value);
+        let price;
+
+        if (!qty || qty == "0") {
+            price = "0.3"
+        } else {
+            price = MathUtils.roundToPrecision(0.3 * qty, 1).toString();
+        }
+
+        checkQuantity(qty);
+        setPriceLabel(price);
+        setQty(qty);
     }
 
     const getPriceEth = async (qty) => {
@@ -120,31 +146,35 @@ function App() {
         const leaf = keccak256(accounts[0]);
 
         const proof = tree.getHexProof(leaf);
+        setTxPending(true);
         await oxmose.methods
             .mint(web3.utils.toBN(qty), proof, [])
             .send({ from: accounts[0], value: priceToPay })
-            .on("confirmation", async () => {
+            .once("confirmation", async () => {
                 console.log("transaction done");
                 setSuccess("Mint Successful !");
                 setError("");
                 const nbMintPublic = await oxmose.methods.numberMinted(accounts[0]).call();
                 setNbMintPublic(parseInt(nbMintPublic));
+                setTxPending(false);
             })
-            .on('error', async () => {
+            .once('error', async () => {
                 setSuccess("");
                 setError("Transaction failed, please try again !");
                 console.error("transaction failed");
                 const nbMintPublic = await oxmose.methods.numberMinted(accounts[0]).call();
                 setNbMintPublic(parseInt(nbMintPublic));
+                setTxPending(false);
             });;
     }
 
     const submit = async (e) => {
         e.preventDefault();
-        let quantityValid = await checkQuantity(qty);
-        console.log("valid qty", quantityValid);
-        if (quantityValid) {
-            mint();
+        if (!txPending) {
+            let quantityValid = await checkQuantity(qty);
+            if (quantityValid) {
+                mint();
+            }
         }
     }
 
@@ -152,7 +182,6 @@ function App() {
         const nbMintPublic = await oxmose.methods.numberMinted(accounts[0]).call();
 
         if (isNaN(qty) || parseInt(qty) === 0) {
-            console.log("error set");
             setError("Quantity must be greater than 0.");
             setSuccess("");
 
@@ -191,10 +220,10 @@ function App() {
                                 <div>
                                     {web3 && !loader ?
                                         <div>
-                                            <div className="bg-gradient-to-r col-12 rounded-full from-indigo-500 to-pink-500 text-white font-bold text-xl sm:text-2xl md:text-3xl flex">
+                                            <div className="md:mx-10 bg-gradient-to-r rounded-full from-indigo-500 to-pink-500 text-white font-bold text-xl sm:text-2xl md:text-3xl flex">
                                                 <input onChange={e => { handleQtyChange(e) }} className="pl-6 w-16 bg-transparent rounded-l-full border-r border-purple-900" placeholder="0" type="number" min="1" max="5" autoFocus />
-                                                <a href="#" onClick={e => { submit(e) }} className="pr-10 pl-5 py-5 block w-full rounded-r-full transition duration-300 ease transform hover:scale-105">
-                                                    Mint 0.3 ETH
+                                                <a href="#" onClick={e => { submit(e) }} className={`${txPending ? "cursor-not-allowed opacity-60 bg-opacity-25" : "hover:scale-105"} pr-10 pl-5 py-5 block w-full rounded-r-full transition duration-300 ease transform`}>
+                                                    Mint {priceLabel} ETH
                                                     <div className="text-sm text-center font-normal">+ fees</div>
                                                 </a>
                                             </div>
@@ -203,8 +232,10 @@ function App() {
                                         </div>
 
                                         :
-                                        <a href="#" onClick={() => { init() }}
-                                            className="px-6 py-3 inline-block text-white rounded-full font-bold bg-gradient-to-r from-indigo-500 to-pink-500 transition duration-300 ease transform hover:scale-105">
+                                        <a className="px-6 py-3 inline-block text-white rounded-full font-bold bg-gradient-to-r from-indigo-500 to-pink-500 transition duration-300 ease transform hover:scale-105"
+                                            href={window.ethereum ? "#" : "https://metamask.app.link/dapp/vigorous-heyrovsky-968388.netlify.app/"}
+                                            target={window.ethereum ? "" : "_blank"}
+                                            onClick={() => { init() }}>
                                             Connect
                                         </a>
                                     }

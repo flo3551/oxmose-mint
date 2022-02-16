@@ -768,6 +768,10 @@
             padding: .25rem
         }
 
+        .p-4 {
+            padding: 1rem
+        }
+
         .p-10 {
             padding: 2.5rem
         }
@@ -1125,6 +1129,11 @@
                 margin-right: 0
             }
 
+            .md\:mx-10 {
+                margin-left: 2.5rem;
+                margin-right: 2.5rem;
+            }
+
             .md\:mx-6 {
                 margin-left: 1.5rem;
                 margin-right: 1.5rem
@@ -1183,6 +1192,10 @@
 
             .md\:pt-20 {
                 padding-top: 5rem
+            }
+
+            .md\:pt-10 {
+                padding-top: 2.5rem
             }
 
             .md\:pl-5 {
@@ -1263,6 +1276,10 @@
                 max-width: 1280px
             }
         }
+
+        .md\:min-h-screen {
+            min-height: 100vh
+        }
     </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1303,7 +1320,7 @@
         </div>
 
         <div
-            class="pt-10 md:pt-20 mb-10 flex-grow mx-auto py-4 px-3 md:h-screen md:container xl:max-w-screen-xl flex flex-col items-center justify-center z-10">
+            class="pt-10 md:pt-20 mb-10 flex-grow mx-auto py-4 px-3 md:min-h-screen md:container xl:max-w-screen-xl flex flex-col items-center justify-center z-10">
             <div>
                 <h1 class="block text-5xl md:text-8xl text-center text-white font-bold">
                     <div class="text-2xl uppercase">serie #1</div>
@@ -1312,10 +1329,10 @@
 
                 <p class="mt-10 text-white lg:px-28 text-center">
                     For this exclusive first Edition we are glade to distribute commun, rare, super rare and legendary
-                    3D modelisation of French artists: Tayc, RK, Alérino, Lynda.
+                    3D modelisation of French artists: Tayc, RK, l'Algérino, Lynda.
                 </p>
 
-                <div class="mt-14 lg:mx-28 p-10 flex bg-purple-900 bg-opacity-25 rounded-xl">
+                <div class="mt-14 lg:mx-28 p-4 md:p-10 flex bg-purple-900 bg-opacity-25 rounded-xl">
                     <div class="mt-2 w-full md:flex justify-center items-center md:space-x-8">
 
                         <!-- <div class="flex-1 md:flex justify-end text-center">
@@ -1328,11 +1345,13 @@
                             </div>
                         </div>
      -->
-                        <div id="react-target"></div>
+                        <div id="react-target" class="flex-1 md:flex flex-col justify-end text-center"></div>
 
-                        <div id="mint-separator-section" noopacity class="hidden md:block mx-10 bg-white w-2 h-full rounded-full bg-opacity-10"></div>
+                        <div id="mint-separator-section" noopacity
+                            class="hidden md:block mx-10 bg-white w-2 h-full rounded-full bg-opacity-10"></div>
 
-                        <div id="mint-right-section" hidden class="mt-10 md:mt-0 flex-1 text-white font-semibold text-lg text-center md:text-left">
+                        <div id="mint-right-section" hidden
+                            class="mt-10 md:mt-0 flex-1 text-white font-semibold text-lg text-center md:text-left">
                             You get
                             <ul class="md:pl-5 md:list-disc text-sm opacity-90">
                                 <li class="mt-3 md:mt-0">
