@@ -31,8 +31,8 @@ function App() {
     const [isSoldOut, setSoldOut] = useState(false);
     const [txPending, setTxPending] = useState(false);
 
-    // const [countdownDate, setCountdownDate] = useState(1645128000000); PROD TIMESTAMP
-    const [countdownDate, setCountdownDate] = useState(1645038300000);
+    const [countdownDate, setCountdownDate] = useState(1645128000000);
+    // const [countdownDate, setCountdownDate] = useState(1645038300000);
     const [countdownEnded, setCountdownEnded] = useState(undefined);
     const [countdownDays, setCountdownDays] = useState("00");
     const [countdownHours, setCountdownHours] = useState("00");
@@ -268,7 +268,7 @@ function App() {
 
                                     <div className="py-4 px-0 md:p-4 bg-opacity-25 rounded-xl">
                                         <h2 className="text-center text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-pink-500">
-                                            Public sale starts in:
+                                            Public Mint starts in:
                                         </h2>
                                         <div className="mt-10 mx-auto px-4 md:px-0 flex justify-center items-center font-bold text-gray-500 text-center">
                                             <div className="mx-1 md:mx-6 p-1 py-3 md:p-4 w-1/4 bg-white bg-opacity-5 rounded-2xl">
