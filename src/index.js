@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserView, MobileView } from 'react-device-detect';
 import ReactDOM from 'react-dom'
+import { ClipLoader, HashLoader } from 'react-spinners';
+import { css } from "@emotion/react";
 import { getWeb3, getOxmose } from "./utils.js";
 const { MerkleTree } = require("merkletreejs");
 const keccak256 = require("keccak256");
@@ -10,7 +11,10 @@ const MathUtils = {
         return +((+subject).toFixed(precision));
     }
 };
-
+const spinnerCss = css`
+  display: block;
+  margin: 0 auto;
+`;
 
 function App() {
     const [loader, setLoader] = useState(true);
@@ -220,24 +224,36 @@ function App() {
                                 <div>
                                     {web3 && !loader ?
                                         <div>
-                                            <div className="md:mx-10 bg-gradient-to-r rounded-full from-indigo-500 to-pink-500 text-white font-bold text-xl sm:text-2xl md:text-3xl flex">
-                                                <input onChange={e => { handleQtyChange(e) }} className="pl-6 w-16 bg-transparent rounded-l-full border-r border-purple-900" placeholder="0" type="number" min="1" max="5" autoFocus />
-                                                <a href="#" onClick={e => { submit(e) }} className={`${txPending ? "cursor-not-allowed opacity-60 bg-opacity-25" : "hover:scale-105"} pr-10 pl-5 py-5 block w-full rounded-r-full transition duration-300 ease transform`}>
-                                                    Mint {priceLabel} ETH
-                                                    <div className="text-sm text-center font-normal">+ fees</div>
-                                                </a>
-                                            </div>
-                                            <div className="text-white py-5 font-bold">Minted {nbMintPublic} / 5 NFTs </div>
-                                            <div className="text-white text-xs">Connected with {accounts[0]}</div>
+                                            {!txPending ?
+                                                <div>
+                                                    <div className="md:mx-10 bg-gradient-to-r rounded-full from-indigo-500 to-pink-500 text-white font-bold text-xl sm:text-2xl md:text-3xl flex">
+                                                        <input onChange={e => { handleQtyChange(e) }} className="pl-6 w-16 bg-transparent rounded-l-full border-r border-purple-900" placeholder="0" type="number" min="1" max="5" autoFocus />
+                                                        <a href="#" onClick={e => { submit(e) }} className={`${txPending ? "cursor-not-allowed opacity-60 bg-opacity-25" : "hover:scale-105"} pr-10 pl-5 py-5 block w-full rounded-r-full transition duration-300 ease transform`}>
+                                                            Mint {priceLabel} ETH
+                                                            <div className="text-sm text-center font-normal">+ fees</div>
+                                                        </a>
+                                                    </div>
+                                                    <div className="text-white py-5 font-bold">Minted {nbMintPublic} / 5 NFTs </div>
+                                                    <div className="text-white text-xs">Connected with {accounts[0]}</div>
+                                                </div>
+                                                :
+                                                <div>
+                                                    <HashLoader className="mt-10" color="#ffffff" css={spinnerCss} loading={true} size={50} />
+                                                    <div className="text-white py-5 font-bold">Minted {nbMintPublic} / 5 NFTs </div>
+                                                    <div className="text-white text-xs">Connected with {accounts[0]}</div>
+                                                </div>
+                                            }
                                         </div>
 
                                         :
-                                        <a className="px-6 py-3 inline-block text-white rounded-full font-bold bg-gradient-to-r from-indigo-500 to-pink-500 transition duration-300 ease transform hover:scale-105"
-                                            href={window.ethereum ? "#" : "https://metamask.app.link/dapp/vigorous-heyrovsky-968388.netlify.app/"}
-                                            target={window.ethereum ? "" : "_blank"}
-                                            onClick={() => { init() }}>
-                                            Connect
-                                        </a>
+                                        <div>
+                                            <a className="px-6 py-3 inline-block text-white rounded-full font-bold bg-gradient-to-r from-indigo-500 to-pink-500 transition duration-300 ease transform hover:scale-105"
+                                                href={window.ethereum ? "#" : "https://metamask.app.link/dapp/mint.oxmose.co/"}
+                                                target={window.ethereum ? "" : "_blank"}
+                                                onClick={() => { init() }}>
+                                                Connect
+                                            </a>
+                                        </div>
                                     }
 
                                     {error && <p className='alert text-red'>{error}</p>}

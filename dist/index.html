@@ -17,6 +17,47 @@
     <link href="https://uploads-ssl.webflow.com/61b153f7ae6a78638552f20a/61b38d027846e9357cc395e6_logo_oxomose.png"
         rel="apple-touch-icon">
 
+    <!-- Facebook Pixel Code -->
+    <script>
+        !function (f, b, e, v, n, t, s) {
+            if (f.fbq) return; n = f.fbq = function () {
+                n.callMethod ?
+                n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+            n.queue = []; t = b.createElement(e); t.async = !0;
+            t.src = v; s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }(window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '937161940233890');
+        fbq('track', 'PageView');
+        fbq('track', 'ViewContent');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+            src="https://www.facebook.com/tr?id=937161940233890&ev=PageView&noscript=1" /></noscript>
+
+    <script>
+        // Delay pixel when 30s is watched
+        var seconds = 30;
+        setTimeout(function () {
+            fbq('track', 'timeSpent = 30s');
+        }, seconds * 1000);
+
+        // Delay pixel when 60s is watched
+        var seconds = 60;
+        setTimeout(function () {
+            fbq('track', 'timeSpent = 60s');
+        }, seconds * 1000);
+
+        // Delay pixel when 90s is watched
+        var seconds = 90;
+        setTimeout(function () {
+            fbq('track', 'timeSpent = 90s');
+        }, seconds * 1000);
+    </script>
+
+    <!-- End Facebook Pixel Code -->
 
     <style>
         /*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*/
